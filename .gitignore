@@ -1,19 +1,19 @@
-# Entorno virtual
+
 venv/
 pruning_env/
 
-# Archivos de caché de Python
+
 __pycache__/
 *.pyc
 *.pyo
 
-# Dependencias específicas de usuario
+
 *.env
 
-# Archivos generados
 *.log
 *.csv
 *.sqlite3
 
-# Configuración de VS Code
 .vscode/
+
+models/*.pth
