@@ -12,9 +12,10 @@ class InferenceRunner:
         model (torch.nn.Module): Model to run inference on.
         device (torch.device): Device to run inference on.
         num_iters (int): Number of inference iterations.
+        num_trials (int): Number of trials for statistical analysis.
         energy_monitor (EnergyMonitor): Monitors GPU energy consumption.
     """
-    def __init__(self, model: torch.nn.Module, device: torch.device, num_iters: int):
+    def __init__(self, model: torch.nn.Module, device: torch.device, num_iters: int, num_trials: int):
         """
         Initializes the InferenceRunner.
         
@@ -22,15 +23,17 @@ class InferenceRunner:
             model (torch.nn.Module): Model to run inference on.
             device (torch.device): Device to use for inference.
             num_iters (int): Number of iterations to measure.
+            num_trials (int): Number of trials for statistical analysis.
         """
         self.model = model
         self.device = device
         self.num_iters = num_iters
+        self.num_trials = num_trials
         self.energy_monitor = EnergyMonitor()
     
     def run(self, input_tensor: torch.Tensor) -> Tuple[float, float, float, float]:
         """
-        Executes multiple inference iterations and returns timing and energy statistics.
+        Executes multiple inference trials and returns timing and energy statistics.
         
         Args:
             input_tensor (torch.Tensor): Input tensor for the model.
@@ -43,17 +46,22 @@ class InferenceRunner:
         end_time = torch.cuda.Event(enable_timing=True)
         batch_size = input_tensor.shape[0]
         
-        for _ in tqdm(range(self.num_iters), desc=f"Running {self.num_iters} iterations"):
-            start_energy = self.energy_monitor.get_energy()
-            start_time.record()
-            with torch.no_grad():
-                self.model(input_tensor)
-            end_time.record()
-            torch.cuda.synchronize()
-            end_energy = self.energy_monitor.get_energy()
+        for trial in range(self.num_trials):
+            trial_times, trial_energies = [], []
+            for _ in tqdm(range(self.num_iters), desc=f"Trial {trial + 1}/{self.num_trials}: Running {self.num_iters} iterations"):
+                start_energy = self.energy_monitor.get_energy()
+                start_time.record()
+                with torch.no_grad():
+                    self.model(input_tensor)
+                end_time.record()
+                torch.cuda.synchronize()
+                end_energy = self.energy_monitor.get_energy()
 
-            times.append((start_time.elapsed_time(end_time) / 1000) / batch_size)  # Convert to seconds and normalize
-            energies.append((end_energy - start_energy) / batch_size)  # Normalize energy per sample
+                trial_times.append((start_time.elapsed_time(end_time) / 1000) / batch_size)  # Convert to seconds and normalize
+                trial_energies.append((end_energy - start_energy) / batch_size)  # Normalize energy per sample
+            
+            times.extend(trial_times)
+            energies.extend(trial_energies)
 
         mean_time = sum(times) / len(times)
         std_time = statistics.stdev(times) if len(times) > 1 else 0

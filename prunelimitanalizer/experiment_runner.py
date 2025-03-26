@@ -56,7 +56,7 @@ class ExperimentRunner:
             for batch_size in self.batch_sizes:
                 input_tensor = torch.randn(batch_size, 3, 224, 224).to(self.device)
                 flops, params = ModelAnalyzer.analyze(model, input_tensor)
-                inference_runner = InferenceRunner(model, self.device, self.num_iters)
+                inference_runner = InferenceRunner(model, self.device, self.num_iters, self.num_trials)
 
                 mean_time, std_time, mean_energy, std_energy = inference_runner.run(input_tensor)
 
