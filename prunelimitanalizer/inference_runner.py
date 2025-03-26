@@ -60,8 +60,8 @@ class InferenceRunner:
                 trial_times.append((start_time.elapsed_time(end_time) / 1000) / batch_size)  # Convert to seconds and normalize
                 trial_energies.append((end_energy - start_energy) / batch_size)  # Normalize energy per sample
             
-            times.extend(trial_times)
-            energies.extend(trial_energies)
+            times.append(sum(trial_times) / len(trial_times))
+            energies.append(sum(trial_energies) / len(trial_energies))
 
         mean_time = sum(times) / len(times)
         std_time = statistics.stdev(times) if len(times) > 1 else 0
