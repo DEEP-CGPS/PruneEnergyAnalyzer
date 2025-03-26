@@ -36,7 +36,7 @@ class InferenceRunner:
             input_tensor (torch.Tensor): Input tensor for the model.
         
         Returns:
-            Tuple[float, float, float, float]: Mean time per sample, std time per sample, mean energy, std energy.
+            Tuple[float, float, float, float]: Mean time per sample, std time per sample, mean energy per sample, std energy per sample.
         """
         times, energies = [], []
         start_time = torch.cuda.Event(enable_timing=True)
@@ -53,7 +53,7 @@ class InferenceRunner:
             end_energy = self.energy_monitor.get_energy()
 
             times.append((start_time.elapsed_time(end_time) / 1000) / batch_size)  # Convert to seconds and normalize
-            energies.append(end_energy - start_energy)
+            energies.append((end_energy - start_energy) / batch_size)  # Normalize energy per sample
 
         mean_time = sum(times) / len(times)
         std_time = statistics.stdev(times) if len(times) > 1 else 0
