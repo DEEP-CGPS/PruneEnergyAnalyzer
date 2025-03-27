@@ -20,9 +20,21 @@ class ExperimentRunner:
         num_iters (int): Number of inference iterations per trial.
         device (torch.device): Device to run inference on.
         result_saver (ResultSaver): Saves experiment results.
+        input_channels (int): Number of input channels for the tensor.
+        input_height (int): Height of the input tensor.
+        input_width (int): Width of the input tensor.
     """
 
-    def __init__(self, model_dir: str, batch_sizes: List[int], num_trials: int = 10, num_iters: int = 50):
+    def __init__(
+        self, 
+        model_dir: str, 
+        batch_sizes: List[int], 
+        num_trials: int = 10, 
+        num_iters: int = 50, 
+        input_channels: int = 3, 
+        input_height: int = 224, 
+        input_width: int = 224
+    ):
         """
         Initializes the ExperimentRunner.
 
@@ -31,6 +43,9 @@ class ExperimentRunner:
             batch_sizes (List[int]): Batch sizes to test.
             num_trials (int): Number of trials for each configuration.
             num_iters (int): Number of iterations per inference run.
+            input_channels (int): Number of input channels.
+            input_height (int): Height of the input tensor.
+            input_width (int): Width of the input tensor.
         """
         self.model_loader = ModelLoader(model_dir)
         self.batch_sizes = batch_sizes
@@ -38,6 +53,9 @@ class ExperimentRunner:
         self.num_iters = num_iters
         self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
         self.result_saver = ResultSaver()
+        self.input_channels = input_channels
+        self.input_height = input_height
+        self.input_width = input_width
 
     def run_experiment(self) -> pd.DataFrame:
         """
@@ -54,11 +72,12 @@ class ExperimentRunner:
             gpr, arch, pruning_distribution = self.model_loader.parse_model_name(model_path)
 
             for batch_size in self.batch_sizes:
-                input_tensor = torch.randn(batch_size, 3, 224, 224).to(self.device)
+                input_tensor = torch.randn(batch_size, self.input_channels, self.input_height, self.input_width).to(self.device)
                 flops, params = ModelAnalyzer.analyze(model, input_tensor)
                 inference_runner = InferenceRunner(model, self.device, self.num_iters, self.num_trials)
 
                 mean_time, std_time, mean_energy, std_energy = inference_runner.run(input_tensor)
+                fps = 1.0 / mean_time if mean_time > 0 else float('inf')
 
                 result = {
                     "GPR": gpr,
@@ -66,6 +85,7 @@ class ExperimentRunner:
                     "Pruning Distribution": pruning_distribution,
                     "BATCH_SIZE": batch_size,
                     "Mean Time per Sample (s)": mean_time,
+                    "FPS": fps,
                     "STD Time per Sample (s)": std_time,
                     "Mean Energy per Sample (J)": mean_energy,
                     "STD Energy per Sample (J)": std_energy,
@@ -82,3 +102,5 @@ class ExperimentRunner:
         """Ensures NVML is properly shutdown when the experiment is finished."""
         import pynvml
         pynvml.nvmlShutdown()
+
+
