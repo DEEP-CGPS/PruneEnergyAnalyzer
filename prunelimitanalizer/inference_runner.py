@@ -57,11 +57,11 @@ class InferenceRunner:
                 torch.cuda.synchronize()
                 end_energy = self.energy_monitor.get_energy()
 
-                trial_times.append((start_time.elapsed_time(end_time) / 1000) / batch_size)  # Convert to seconds and normalize
-                trial_energies.append((end_energy - start_energy) / batch_size)  # Normalize energy per sample
+                trial_times.append((start_time.elapsed_time(end_time) / 1000))  # Convert to seconds and normalize
+                trial_energies.append((end_energy - start_energy))  # Normalize energy per sample
             
-            times.append(sum(trial_times) / len(trial_times))
-            energies.append(sum(trial_energies) / len(trial_energies))
+            times.append((sum(trial_times) / len(trial_times)) / batch_size)
+            energies.append((sum(trial_energies) / len(trial_energies)) / batch_size)
 
         mean_time = sum(times) / len(times)
         std_time = statistics.stdev(times) if len(times) > 1 else 0
