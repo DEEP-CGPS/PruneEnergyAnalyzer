@@ -4,6 +4,7 @@ from .model_analyzer import ModelAnalyzer
 from .inference_runner import InferenceRunner
 from .result_saver import ResultSaver
 from .experiment_runner import ExperimentRunner
+from .analysis_plotter import AnalysisPlotter
 
 __all__ = [
     "EnergyMonitor",
@@ -11,5 +12,6 @@ __all__ = [
     "ModelAnalyzer",
     "InferenceRunner",
     "ResultSaver",
-    "ExperimentRunner"
+    "ExperimentRunner",
+    "AnalysisPlotter",
 ]
