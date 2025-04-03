@@ -33,7 +33,8 @@ class ExperimentRunner:
         num_iters: int = 50, 
         input_channels: int = 3, 
         input_height: int = 224, 
-        input_width: int = 224
+        input_width: int = 224, 
+        filename: str = "experiment_results.csv"
     ):
         """
         Initializes the ExperimentRunner.
@@ -52,10 +53,11 @@ class ExperimentRunner:
         self.num_trials = num_trials
         self.num_iters = num_iters
         self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-        self.result_saver = ResultSaver()
+        self.result_saver = ResultSaver(filename)
         self.input_channels = input_channels
         self.input_height = input_height
         self.input_width = input_width
+        
 
     def run_experiment(self) -> pd.DataFrame:
         """
@@ -72,6 +74,7 @@ class ExperimentRunner:
             gpr, arch, pruning_distribution = self.model_loader.parse_model_name(model_path)
 
             for batch_size in self.batch_sizes:
+                print(f"Processing batch size: {batch_size}")
                 input_tensor = torch.randn(batch_size, self.input_channels, self.input_height, self.input_width).to(self.device)
                 flops, params = ModelAnalyzer.analyze(model, input_tensor)
                 inference_runner = InferenceRunner(model, self.device, self.num_iters, self.num_trials)
@@ -102,5 +105,6 @@ class ExperimentRunner:
         """Ensures NVML is properly shutdown when the experiment is finished."""
         import pynvml
         pynvml.nvmlShutdown()
+
 
 
