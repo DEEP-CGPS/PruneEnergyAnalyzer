@@ -7,7 +7,7 @@ from .model_loader import ModelLoader
 from .model_analyzer import ModelAnalyzer
 from .inference_runner import InferenceRunner
 from .result_saver import ResultSaver
-
+import time
 
 class ExperimentRunner:
     """
@@ -34,7 +34,8 @@ class ExperimentRunner:
         input_channels: int = 3, 
         input_height: int = 224, 
         input_width: int = 224, 
-        filename: str = "experiment_results.csv"
+        filename: str = "experiment_results.csv",
+        skip_completed: bool = True
     ):
         """
         Initializes the ExperimentRunner.
@@ -48,7 +49,7 @@ class ExperimentRunner:
             input_height (int): Height of the input tensor.
             input_width (int): Width of the input tensor.
         """
-        self.model_loader = ModelLoader(model_dir)
+        self.model_loader = ModelLoader(model_dir, result_file=filename, skip_completed=skip_completed)
         self.batch_sizes = batch_sizes
         self.num_trials = num_trials
         self.num_iters = num_iters
@@ -74,7 +75,11 @@ class ExperimentRunner:
             gpr, arch, pruning_distribution = self.model_loader.parse_model_name(model_path)
 
             for batch_size in self.batch_sizes:
+               
                 print(f"Processing batch size: {batch_size}")
+                if self.model_loader.skip_completed and self.model_loader.is_experiment_completed(gpr, arch, pruning_distribution, batch_size):
+                    print(f"Skipping completed experiment for: {gpr}, {arch}, {pruning_distribution}, batch size {batch_size}")
+                    continue
                 input_tensor = torch.randn(batch_size, self.input_channels, self.input_height, self.input_width).to(self.device)
                 flops, params = ModelAnalyzer.analyze(model, input_tensor)
                 inference_runner = InferenceRunner(model, self.device, self.num_iters, self.num_trials)
@@ -98,6 +103,7 @@ class ExperimentRunner:
 
                 results.append(result)
                 self.result_saver.save(result)
+                time.sleep(60)
 
         return pd.DataFrame(results)
 
