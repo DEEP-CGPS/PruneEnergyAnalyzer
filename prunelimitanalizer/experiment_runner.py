@@ -103,7 +103,7 @@ class ExperimentRunner:
 
                 results.append(result)
                 self.result_saver.save(result)
-                time.sleep(60)
+                #time.sleep(60)
 
         return pd.DataFrame(results)
 
