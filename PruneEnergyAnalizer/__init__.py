@@ -5,6 +5,7 @@ from .inference_runner import InferenceRunner
 from .result_saver import ResultSaver
 from .experiment_runner import ExperimentRunner
 from .analysis_plotter import AnalysisPlotter
+from .auxiliar_functions import parse_model_name
 
 __all__ = [
     "EnergyMonitor",
@@ -14,4 +15,5 @@ __all__ = [
     "ResultSaver",
     "ExperimentRunner",
     "AnalysisPlotter",
+    "parse_model_name",
 ]
