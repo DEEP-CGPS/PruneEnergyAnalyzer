@@ -14,19 +14,6 @@ class AnalysisPlotter:
         self.y_column = y_column
         self.title = title
 
-    def _detect_stabilization(self, x_values: np.ndarray, y_values: np.ndarray, patience: int, min_delta: float):
-        best_value = y_values[0]
-        wait = 0
-        for i in range(1, len(y_values)):
-            if y_values[i] < best_value - min_delta:
-                best_value = y_values[i]
-                wait = 0
-            else:
-                wait += 1
-                if wait >= patience:
-                    return x_values[i]
-        return None
-
     def plot_data(self, architectures: list, pruning_distributions: list, batch_sizes: list, patience: int, min_delta: float):
         sns.set(style="whitegrid")
 
@@ -49,13 +36,14 @@ class AnalysisPlotter:
                     filtered = get_combined_filtered(arch, pdistr, batch)
                     if filtered.empty:
                         continue
-                    x_values = filtered[self.x_column].values
+                    x_values = filtered[self.x_column].astype('int64').values
                     y_values = filtered[self.y_column].values
                     std_col = "STD " + self.y_column.replace("Mean ", "")
                     std_values = filtered[std_col].values if std_col in filtered.columns else np.zeros_like(y_values)
                     label = f"{arch}-{pdistr}-Batch {batch}"
                     sns.lineplot(x=x_values, y=y_values, marker='o', label=label, errorbar=None)
                     if np.any(std_values > 0):
+                        print(x_values, y_values, std_values)
                         plt.fill_between(x_values, y_values - std_values, y_values + std_values, alpha=0.2)
                     if 0 in x_values and num == 0:
                         unpruned_value = y_values[np.where(x_values == 0)][0]

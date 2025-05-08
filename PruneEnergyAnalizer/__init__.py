@@ -5,7 +5,7 @@ from .inference_runner import InferenceRunner
 from .result_saver import ResultSaver
 from .experiment_runner import ExperimentRunner
 from .analysis_plotter import AnalysisPlotter
-from .auxiliar_functions import parse_model_name
+from .auxiliar_functions import parse_model_name, add_compression_ratio
 
 __all__ = [
     "EnergyMonitor",
@@ -16,4 +16,5 @@ __all__ = [
     "ExperimentRunner",
     "AnalysisPlotter",
     "parse_model_name",
+    "add_compression_ratio",
 ]
