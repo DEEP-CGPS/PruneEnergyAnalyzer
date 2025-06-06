@@ -1,5 +1,6 @@
 <img src="https://github.com/user-attachments/assets/40310b7a-a864-4ed2-a2dd-c488231aee6b" width="300"/>
 
+---
 ### 📦 Dependencies
 
 | Package       | Version  | Badges |
@@ -11,6 +12,7 @@
 | **matplotlib**| 3.10.3    | [![PyPI - matplotlib](https://img.shields.io/pypi/v/matplotlib.svg)](https://pypi.org/project/matplotlib/) [![PyPI - Downloads](https://img.shields.io/pypi/dm/matplotlib.svg)](https://pypi.org/project/matplotlib/) |
 | **tqdm**      | 4.68.1   | [![PyPI - tqdm](https://img.shields.io/pypi/v/tqdm.svg)](https://pypi.org/project/tqdm/) [![PyPI - Downloads](https://img.shields.io/pypi/dm/tqdm.svg)](https://pypi.org/project/tqdm/) |
 
+---
 ### 🧠 What is PruneEnergyAnalyzer?
 
 **PruneEnergyAnalyzer** is a Python-based toolkit designed to analyze the energy consumption of pruned deep learning models. It allows you to:
