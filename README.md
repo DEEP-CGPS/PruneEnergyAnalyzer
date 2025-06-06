@@ -1,4 +1,4 @@
-<img src="[https://github.com/user-attachments/assets/40310b7a-a864-4ed2-a2dd-c488231aee6b](https://github.com/user-attachments/assets/bc296bad-423e-4bde-b609-22bb8199644a)" width="300"/>
+<img src="https://github.com/user-attachments/assets/5ef16e06-76d9-4c0f-be0b-23c9f73cbcb4" width="300"/>
 
 ---
 ### 📦 Dependencies
