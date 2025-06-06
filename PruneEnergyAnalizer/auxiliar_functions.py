@@ -1,7 +1,4 @@
 import pandas as pd
-import numpy as np
-import seaborn as sns
-import matplotlib.pyplot as plt
 
 def _parse_model_name_from_string(name: str):
     parts = name.split("_")
@@ -89,60 +86,3 @@ def add_compression_ratio(
             ).round(decimals)
 
     return df
-
-
-def plot_energy_and_metric_curve(
-    dataframe: pd.DataFrame,
-    architecture: str,
-    pruning_distribution: str,
-    batch_size: int,
-    energy_column: str,
-    metric_column: str,
-    metric_label: str = "Accuracy (%)",
-    title: str = "Energy vs. Accuracy Tradeoff"
-):
-    """
-    Plots energy consumption and an additional model metric over different pruning levels.
-
-    Args:
-        dataframe (pd.DataFrame): The data containing GPR, energy, and metric values.
-        architecture (str): Model architecture to filter.
-        pruning_distribution (str): Pruning distribution to filter.
-        batch_size (int): Batch size to filter.
-        energy_column (str): Column name for energy values.
-        metric_column (str): Column name for additional metric values (e.g., Accuracy).
-        metric_label (str): Label for the secondary y-axis.
-        title (str): Title of the plot.
-    """
-    df = dataframe[
-        (dataframe["Architecture"] == architecture) &
-        (dataframe["Pruning Distribution"] == pruning_distribution) &
-        (dataframe["BATCH_SIZE"] == batch_size)
-    ].sort_values(by="GPR")
-
-    if df.empty:
-        print("No data found for the specified filter.")
-        return
-
-    fig, ax1 = plt.subplots(figsize=(8, 5))
-    sns.set(style="whitegrid")
-
-    # Energy plot
-    color1 = "tab:blue"
-    ax1.set_xlabel("GPR (%)")
-    ax1.set_ylabel(energy_column, color=color1)
-    ax1.plot(df["GPR"], df[energy_column], marker='o', color=color1, label=energy_column)
-    ax1.tick_params(axis='y', labelcolor=color1)
-
-    # Metric plot
-    ax2 = ax1.twinx()
-    color2 = "tab:red"
-    ax2.set_ylabel(metric_label, color=color2)
-    ax2.plot(df["GPR"], df[metric_column], marker='s', linestyle='--', color=color2, label=metric_label)
-    ax2.tick_params(axis='y', labelcolor=color2)
-
-    # Title and layout
-    plt.title(title)
-    fig.tight_layout()
-    plt.grid(True, linestyle='--', linewidth=0.5)
-    plt.show()
