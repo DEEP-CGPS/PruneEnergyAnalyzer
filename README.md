@@ -1,4 +1,4 @@
-<img src="https://github.com/user-attachments/assets/40310b7a-a864-4ed2-a2dd-c488231aee6b" width="300"/>
+<img src="https://github.com/user-attachments/assets/5ef16e06-76d9-4c0f-be0b-23c9f73cbcb4" width="300"/>
 
 ---
 ### 📦 Dependencies
@@ -35,17 +35,41 @@ pip install -r requirements.txt
 ### 🚀 Quick Example
 
 ```python
-from pruneenergy import ExperimentRunner
+import sys
+import os
 
+# Add the library path (assuming the library is one folder above this script)
+lib_path = os.path.abspath(os.path.join(os.getcwd(), ".."))
+if lib_path not in sys.path:
+    sys.path.append(lib_path)
+
+import torch
+import pandas as pd
+from PruneEnergyAnalizer import ExperimentRunner
+
+# Define the model directory (adjust as needed)
+model_dir = os.path.abspath(os.path.join(os.getcwd(), "..", "models"))
+
+# Define experiment parameters
+batch_sizes = [1, 8, 16, 32, 64]  # Adjust according to GPU memory
+input_channels = 3
+input_height = 224
+input_width = 224
+
+# Initialize and run the experiment
 experiment = ExperimentRunner(
-    model_dir="models/",
-    batch_sizes=[1, 8],
-    num_trials=10,
-    num_iters=500,
-    input_shape=(3, 224, 224),
-    filename="results.csv"
+    model_dir = model_dir,             # Path to the directory containing all pruned models
+    batch_sizes = batch_sizes,         # List of batch sizes to be tested (e.g., [1, 8, 16, 32, 64])
+    input_channels = input_channels,   # Number of channels in the input images (e.g., 3 for RGB)
+    input_height = input_height,       # Height of the input images (e.g., 224 for 224x224 images)
+    input_width = input_width,         # Width of the input images (e.g., 224 for 224x224 images)
+    filename = "results.csv",          # Output filename for the experiment results (CSV)
 )
-results = experiment.run_experiment()
+
+results_df = experiment.run_experiment()
+
+# Display the results DataFrame
+results_df
 ```
 
 ---
