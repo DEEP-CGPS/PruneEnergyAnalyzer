@@ -43,14 +43,13 @@ class AnalysisPlotter:
                     label = f"{arch}-{pdistr}-Batch {batch}"
                     sns.lineplot(x=x_values, y=y_values, marker='o', label=label, errorbar=None)
                     if np.any(std_values > 0):
-                        print(x_values, y_values, std_values)
                         plt.fill_between(x_values, y_values - std_values, y_values + std_values, alpha=0.2)
                     if 0 in x_values and num == 0:
                         unpruned_value = y_values[np.where(x_values == 0)][0]
                         plt.scatter(0, unpruned_value, color='red', s=100, zorder=3, label=f"Unpruned Model ({arch}-Batch {batch})")
         plt.xlabel(self.x_column)
         plt.ylabel(self.y_column)
-        plt.title(f"Original: {self.title}")
+        plt.title(f"{self.title}")
         plt.legend(fontsize='small')
         plt.show()
 
@@ -110,3 +109,78 @@ class AnalysisPlotter:
         plt.legend(fontsize='small')
         plt.show()
 
+
+def plot_energy_and_metric_curve(
+    dataframe: pd.DataFrame,
+    x_column: str,
+    energy_column: str,
+    metric_column: str,
+    title: str = "Energy vs Metric Trade-off"
+):
+    """
+    Plots energy consumption and a secondary model metric over a specified X-axis.
+
+    Args:
+        dataframe (pd.DataFrame): DataFrame with experiment data.
+        x_column (str): Column name for the X-axis (e.g., 'GPR', 'Compression Ratio').
+        energy_column (str): Column name for the energy values (e.g., 'Mean Energy per Sample (J)').
+        metric_column (str): Column name for the model metric (e.g., 'Accuracy (%)').
+        title (str): Title of the plot.
+    """
+    sns.set(style="whitegrid")
+    fig, ax1 = plt.subplots(figsize=(8, 5))
+
+    # Plot energy (left Y-axis)
+    sns.lineplot(
+        data=dataframe,
+        x=x_column,
+        y=energy_column,
+        marker='o',
+        color='tab:blue',
+        ax=ax1
+    )
+    ax1.set_ylabel(energy_column, color='tab:blue')
+    ax1.tick_params(axis='y', labelcolor='tab:blue')
+
+    # Plot metric (right Y-axis)
+    ax2 = ax1.twinx()
+    sns.lineplot(
+        data=dataframe,
+        x=x_column,
+        y=metric_column,
+        marker='s',
+        color='tab:green',
+        ax=ax2
+    )
+    ax2.set_ylabel(metric_column, color='tab:green')
+    ax2.tick_params(axis='y', labelcolor='tab:green')
+
+    # Add unpruned model point (GPR = 0)
+    unpruned = dataframe[dataframe[x_column] == 0]
+    handles = []
+
+    if not unpruned.empty:
+        unpruned_energy = unpruned[energy_column].values[0]
+        unpruned_metric = unpruned[metric_column].values[0]
+
+        h1 = ax1.scatter(0, unpruned_energy, color='red', s=100, zorder=5)
+        h2 = ax2.scatter(0, unpruned_metric, color='red', s=100, zorder=5)
+
+        # Build legend handles manually
+        handles = [
+            plt.Line2D([0], [0], color='tab:blue', marker='o', label=energy_column),
+            plt.Line2D([0], [0], color='tab:green', marker='s', label=metric_column),
+            plt.Line2D([0], [0], color='red', marker='o', linestyle='', markersize=10, label='Unpruned Model')
+        ]
+    else:
+        handles = [
+            plt.Line2D([0], [0], color='tab:blue', marker='o', label=energy_column),
+            plt.Line2D([0], [0], color='tab:green', marker='s', label=metric_column)
+        ]
+
+    # Plot layout
+    ax1.set_xlabel(x_column)
+    fig.suptitle(title)
+    ax1.legend(handles=handles, loc='upper left', fontsize='small')
+    fig.tight_layout()
+    plt.show()

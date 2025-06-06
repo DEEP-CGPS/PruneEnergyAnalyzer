@@ -1,4 +1,7 @@
 import pandas as pd
+import numpy as np
+import seaborn as sns
+import matplotlib.pyplot as plt
 
 def _parse_model_name_from_string(name: str):
     parts = name.split("_")
@@ -36,30 +39,36 @@ def add_compression_ratio(
     decimals: int = 0
 ) -> pd.DataFrame:
     """
-    Adds a compression ratio column (%) for each model, comparing it to its corresponding unpruned version
-    (with the same architecture and batch size), based on a specified metric.
+    Adds a compression ratio or energy reduction column (%) for each model,
+    comparing it to its corresponding unpruned version (same architecture and batch size),
+    based on a specified metric.
 
-    The compression ratio is calculated as:
-        Compression Ratio (%) = 100 - (pruned_value / unpruned_value) * 100
+    The reduction is calculated as:
+        100 - (pruned_value / unpruned_value) * 100
 
     Args:
-        df (pd.DataFrame): A DataFrame containing experiment results. Must include:
-                           'MODEL_NAME', 'ARCHITECTURE', 'BATCH_SIZE', and the given metric.
-        unpruned_names (list): List of unpruned model filenames from the 'MODEL_NAME' column.
-        metric (str): Metric to use for compression ratio. Must be either 'Parameters' or 'FLOPs'.
+        df (pd.DataFrame): DataFrame with model results. Must include:
+                           'MODEL_NAME', 'Architecture', 'BATCH_SIZE', and the specified metric.
+        unpruned_names (list): List of unpruned model filenames from 'MODEL_NAME'.
+        metric (str): Metric to use: 'Parameters', 'FLOPs', or 'Mean Energy per Sample (J)'.
         decimals (int): Number of decimal places to round the result.
 
     Returns:
-        pd.DataFrame: A copy of the original DataFrame with one new column:
-                      'Compression Ratio (metric) [%]'.
+        pd.DataFrame: DataFrame with an added percentage reduction column.
 
     Raises:
         ValueError: If an invalid metric is provided.
     """
-    if metric not in ["Parameters", "FLOPs"]:
-        raise ValueError("Metric must be either 'Parameters' or 'FLOPs'.")
+    valid_metrics = ["Parameters", "FLOPs", "Mean Energy per Sample (J)"]
+    if metric not in valid_metrics:
+        raise ValueError(f"Metric must be one of {valid_metrics}.")
 
-    column_name = f"Compression Ratio ({metric}) [%]"
+    # Define column name
+    if metric == "Mean Energy per Sample (J)":
+        column_name = "% Energy Reduction"
+    else:
+        column_name = f"Compression Ratio ({metric}) [%]"
+
     df = df.copy()
     df[column_name] = None
 
@@ -81,3 +90,59 @@ def add_compression_ratio(
 
     return df
 
+
+def plot_energy_and_metric_curve(
+    dataframe: pd.DataFrame,
+    architecture: str,
+    pruning_distribution: str,
+    batch_size: int,
+    energy_column: str,
+    metric_column: str,
+    metric_label: str = "Accuracy (%)",
+    title: str = "Energy vs. Accuracy Tradeoff"
+):
+    """
+    Plots energy consumption and an additional model metric over different pruning levels.
+
+    Args:
+        dataframe (pd.DataFrame): The data containing GPR, energy, and metric values.
+        architecture (str): Model architecture to filter.
+        pruning_distribution (str): Pruning distribution to filter.
+        batch_size (int): Batch size to filter.
+        energy_column (str): Column name for energy values.
+        metric_column (str): Column name for additional metric values (e.g., Accuracy).
+        metric_label (str): Label for the secondary y-axis.
+        title (str): Title of the plot.
+    """
+    df = dataframe[
+        (dataframe["Architecture"] == architecture) &
+        (dataframe["Pruning Distribution"] == pruning_distribution) &
+        (dataframe["BATCH_SIZE"] == batch_size)
+    ].sort_values(by="GPR")
+
+    if df.empty:
+        print("No data found for the specified filter.")
+        return
+
+    fig, ax1 = plt.subplots(figsize=(8, 5))
+    sns.set(style="whitegrid")
+
+    # Energy plot
+    color1 = "tab:blue"
+    ax1.set_xlabel("GPR (%)")
+    ax1.set_ylabel(energy_column, color=color1)
+    ax1.plot(df["GPR"], df[energy_column], marker='o', color=color1, label=energy_column)
+    ax1.tick_params(axis='y', labelcolor=color1)
+
+    # Metric plot
+    ax2 = ax1.twinx()
+    color2 = "tab:red"
+    ax2.set_ylabel(metric_label, color=color2)
+    ax2.plot(df["GPR"], df[metric_column], marker='s', linestyle='--', color=color2, label=metric_label)
+    ax2.tick_params(axis='y', labelcolor=color2)
+
+    # Title and layout
+    plt.title(title)
+    fig.tight_layout()
+    plt.grid(True, linestyle='--', linewidth=0.5)
+    plt.show()
