@@ -3,21 +3,69 @@ import seaborn as sns
 import matplotlib.pyplot as plt
 import pandas as pd
 from scipy.interpolate import make_interp_spline
+from typing import List
 
 class AnalysisPlotter:
     """
-    Class for analyzing and visualizing the impact of pruning on energy consumption.
+    Class for analyzing and visualizing the impact of pruning on energy consumption and performance metrics.
+
+    Parameters
+    ----------
+    dataframe : pd.DataFrame
+        DataFrame containing results from pruning experiments, with columns for architecture, pruning distribution, batch size, metrics, etc.
+    x_column : str
+        Name of the column to use for the x-axis (e.g., 'GPR', 'BATCH_SIZE').
+    y_column : str
+        Name of the column to use for the y-axis (e.g., 'Mean Energy per Sample (J)', 'FPS').
+    title : str
+        Title to use for all generated plots.
     """
-    def __init__(self, dataframe: pd.DataFrame, x_column: str, y_column: str, title: str):
+    def __init__(
+        self, 
+        dataframe: pd.DataFrame, 
+        x_column: str, 
+        y_column: str, 
+        title: str
+    ):
         self.dataframe = dataframe
         self.x_column = x_column
         self.y_column = y_column
         self.title = title
 
-    def plot_data(self, architectures: list, pruning_distributions: list, batch_sizes: list):
+    def plot_data(
+        self, 
+        architectures: List[str], 
+        pruning_distributions: List[str], 
+        batch_sizes: List[int]
+    ) -> None:
+        """
+        Generate and display multiple plots to visualize how pruning and model choices affect the selected metric.
+
+        Parameters
+        ----------
+        architectures : List[str]
+            List of model architecture names to include in the plots (e.g., ['AlexNet', 'VGG11']).
+        pruning_distributions : List[str]
+            List of pruning distribution names to include (e.g., ['random_PD1', 'random_PD2']).
+        batch_sizes : List[int]
+            List of batch sizes to plot (e.g., [1, 32, 128]).
+
+        Notes
+        -----
+        - The method generates three types of plots:
+            1. Original line plot with error bands.
+            2. Smoothed curve using spline interpolation.
+            3. Moving average curve.
+        - Make sure your DataFrame has the necessary columns (see library documentation for details).
+        """
         sns.set(style="whitegrid")
 
-        def get_combined_filtered(arch, pdistr, batch):
+        def get_combined_filtered(arch: str, pdistr: str, batch: int) -> pd.DataFrame:
+            """
+            Filter the DataFrame for a given architecture, pruning distribution, and batch size.
+
+            Returns a DataFrame sorted by the x_column.
+            """
             filtered = self.dataframe[
                 ((self.dataframe["Architecture"] == arch) &
                  (self.dataframe["Pruning Distribution"] == pdistr) &
