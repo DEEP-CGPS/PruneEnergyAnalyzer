@@ -14,7 +14,7 @@ class AnalysisPlotter:
         self.y_column = y_column
         self.title = title
 
-    def plot_data(self, architectures: list, pruning_distributions: list, batch_sizes: list, patience: int, min_delta: float):
+    def plot_data(self, architectures: list, pruning_distributions: list, batch_sizes: list):
         sns.set(style="whitegrid")
 
         def get_combined_filtered(arch, pdistr, batch):
