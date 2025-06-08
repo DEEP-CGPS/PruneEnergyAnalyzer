@@ -73,7 +73,26 @@ results_df
 ```
 
 ---
+### 📓 Step-by-Step Jupyter Notebooks (Recommended Workflow)
 
+For an easier and more practical understanding of how to use `PruneEnergyAnalyzer` and to reproduce the full workflow (from running experiments to generating plots), we recommend following these Jupyter notebooks **in order**:
+
+1. **`1 - RUN_EXPERIMENT.ipynb`**  
+   Run experiments and generate the raw results DataFrame for pruned and unpruned models.
+
+2. **`2 - PREPARE_YOUR_RESULTS_BEFORE_PLOTS.ipynb`**  
+   Prepare and organize your results file: parse model names, merge metrics, and structure your results DataFrame for analysis and plotting.
+
+3. **`3 - ADD_COMPRESSION_RATIOS_(OPTIONAL).ipynb`**  
+   (Optional) Add compression ratio columns (for parameters, FLOPs, energy, etc.) relative to the unpruned baseline model.
+
+4. **`4 - GENERATE_PLOTS.ipynb`**  
+   Visualize your results: generate energy/performance plots using the AnalysisPlotter class, and explore insights about pruning and model efficiency.
+
+**Tip:**  
+Each notebook is self-contained, but following them in order will guide you through a complete use case—from data collection to ready-to-publish figures.
+
+---
 ### 📚 How to cite
 
 If you use this software for research or application purposes, please use the following citation:
