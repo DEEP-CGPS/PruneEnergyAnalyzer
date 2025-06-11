@@ -62,9 +62,9 @@ def add_compression_ratio(
 
     # Define column name
     if metric == "Mean Energy per Sample (J)":
-        column_name = "% Energy Reduction"
+        column_name = "Energy Reduction (%)"
     else:
-        column_name = f"Compression Ratio ({metric}) [%]"
+        column_name = f"Compression Ratio (%) in terms of {metric}"
 
     df = df.copy()
     df[column_name] = None
