@@ -99,7 +99,7 @@ If you use this software for research or application purposes, please use the fo
 
 ```bibtex
 @article{PACHON2025pruneenergyanalyzer,
-  title     = {PruneEnergyAnalyzer: A Toolkit for Measuring Energy Efficiency in Pruned Deep Learning Models},
+  title     = {PruneEnergyAnalyzer: An Open-Source Toolkit for Evaluating Energy Consumption in Pruned Deep Learning Models},
   journal   = {},
   volume    = {},
   pages     = {},
@@ -107,8 +107,8 @@ If you use this software for research or application purposes, please use the fo
   issn      = {},
   doi       = {},
   url       = {https://github.com/DEEP-CGPS/PruneEnergyAnalyzer},
-  author    = {Cesar G. Pachon and Cesar Pedraza and Dora Ballesteros},
-  keywords  = {Energy consumption, Deep learning, CNN pruning, Green AI, Python toolkit}
+  author    = {Cesar Pachon and Cesar Pedraza and Dora Ballesteros},
+  keywords  = {Energy consumption, Deep learning, CNN pruning, Green AI}
 }
 ```
 
