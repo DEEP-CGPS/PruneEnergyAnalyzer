@@ -98,18 +98,20 @@ Each notebook is self-contained, but following them in order will guide you thro
 If you use this software for research or application purposes, please use the following citation:
 
 ```bibtex
-@article{PACHON2025pruneenergyanalyzer,
-  title     = {PruneEnergyAnalyzer: An Open-Source Toolkit for Evaluating Energy Consumption in Pruned Deep Learning Models},
-  journal   = {},
-  volume    = {},
-  pages     = {},
-  year      = {2025},
-  issn      = {},
-  doi       = {},
-  url       = {https://github.com/DEEP-CGPS/PruneEnergyAnalyzer},
-  author    = {Cesar Pachon and Cesar Pedraza and Dora Ballesteros},
-  keywords  = {Energy consumption, Deep learning, CNN pruning, Green AI}
+
+@Article{bdcc9080200,
+AUTHOR = {Pachon, Cesar and Pedraza, Cesar and Ballesteros, Dora},
+TITLE = {PruneEnergyAnalyzer: An Open-Source Toolkit for Evaluating Energy Consumption in Pruned Deep Learning Models},
+JOURNAL = {Big Data and Cognitive Computing},
+VOLUME = {9},
+YEAR = {2025},
+NUMBER = {8},
+ARTICLE-NUMBER = {200},
+URL = {https://www.mdpi.com/2504-2289/9/8/200},
+ISSN = {2504-2289},
+DOI = {10.3390/bdcc9080200}
 }
+
 ```
 
 
